@@ -4,8 +4,13 @@ import TaskItems from './TaskItems';
 function TaskList(props) {
 
     const {tasks} = props;
+    
     var renderTaskItems = tasks.map((task,index) => {
-        return <TaskItems key={index} id={index+1} items={task}/>
+        return <TaskItems key={index} id={index+1} items={task} 
+        onUpdateStatus={props.onUpdateStatus} 
+        onDelete={props.onDelete}
+        onUpdate={props.onUpdate}
+        />
     });
 
     return (
