@@ -9,7 +9,7 @@ function App() {
   const [task, setTask] = useState([]);
   const [onload, setLoad] = useState();
   const [isDisplayForm, setisDisplayForm] = useState(false);
-  const [taskEditing, settaskEditing] = useState();
+  const [taskEditing, settaskEditing] = useState(null);
 
 
 
@@ -35,7 +35,17 @@ function App() {
     <TaskForm onSubmit={onSubmit} onClose={onClose} task={taskEditing} /> : '';
 
   function onToggleForm() {
-    setisDisplayForm(!isDisplayForm);
+    if(isDisplayForm && taskEditing !== null){
+      setisDisplayForm(true);
+      settaskEditing(null)
+    }
+    else
+    {
+      setisDisplayForm(!isDisplayForm);
+      settaskEditing(null)
+
+    }
+    
   }
 
   function onClose() {
@@ -97,7 +107,6 @@ function App() {
 
   function onUpdate(id) {
     var index = findIndex(id);
-
     var taskEditing = task[index];
     settaskEditing(taskEditing);
     onShow();

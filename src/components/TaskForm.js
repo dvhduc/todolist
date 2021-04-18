@@ -2,13 +2,28 @@ import React, { useEffect, useState } from 'react';
 
 
 function TaskForm(props) {
-
-
+    const { task } = props;
     const [formData, setformData] = useState({
         id: '',
         name: '',
         status: false
     })
+
+    useEffect(() => {
+        if (task) {
+            setformData({
+                id: task.id,
+                name: task.name,
+                status: task.status
+            })
+        } else if (!task) {
+            setformData({
+                id: '',
+                name: '',
+                status: false
+            });
+        }
+    }, [task])
 
     function onCloseForm() {
         props.onClose();
@@ -42,27 +57,14 @@ function TaskForm(props) {
         })
     }
 
-    useEffect(() => {
-        if(props.task){
-            setformData({
-                ...formData,                
-                id: props.task.id,
-                name: props.task.name,
-                status: props.task.status
-            })
-            
-        }
-    },[setformData])
-
-
     return (
         <div className="panel panel-warning">
             <div className="panel-heading" >
                 <h3 className="panel-title">
-                {formData.id !== '' ? 'Cập nhật công việc' : 'Thêm công việc'}
+                    {formData.id !== '' ? 'Cập nhật công việc' : 'Thêm công việc'}
                     <span className="fas fa-times-circle pull-right"
-                    onClick={onCloseForm}
-                ></span>
+                        onClick={onCloseForm}
+                    ></span>
                 </h3>
             </div>
             <div className="panel-body">
