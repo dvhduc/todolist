@@ -1,51 +1,51 @@
-import React, { useEffect, useState } from 'react';
-import './App.css';
-import TaskForm from './components/TaskForm'
-import Control from './components/Control';
-import TaskList from './components/TaskList';
+import React, { useEffect, useState } from "react";
+import "./App.css";
+import TaskForm from "./components/TaskForm";
+import Control from "./components/Control";
+import TaskList from "./components/TaskList";
+import { includes } from "lodash";
 
 function App() {
-
   const [task, setTask] = useState([]);
+  const [tasklist, settaskList] = useState(null);
   const [onload, setLoad] = useState();
   const [isDisplayForm, setisDisplayForm] = useState(false);
   const [taskEditing, settaskEditing] = useState(null);
 
-
+  const [keyword, setkeyword] = useState("");
 
   function s4() {
-    return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
+    return Math.floor((1 + Math.random()) * 0x10000)
+      .toString(16)
+      .substring(1);
   }
 
   function generateID() {
-    return s4() + s4() + '-' + s4();
+    return s4() + s4() + "-" + s4();
   }
 
   useEffect(() => {
-    if (localStorage && localStorage.getItem('test')) {
-      var data = JSON.parse(localStorage.getItem('test'));
+    if (localStorage && localStorage.getItem("test")) {
+      var data = JSON.parse(localStorage.getItem("test"));
 
-      setTask(data)
+      setTask(data);
     }
+  }, [setTask]);
 
-  }, [setTask])
-
-
-  var elmTaskForm = isDisplayForm ?
-    <TaskForm onSubmit={onSubmit} onClose={onClose} task={taskEditing} /> : '';
+  var elmTaskForm = isDisplayForm ? (
+    <TaskForm onSubmit={onSubmit} onClose={onClose} task={taskEditing} />
+  ) : (
+    ""
+  );
 
   function onToggleForm() {
-    if(isDisplayForm && taskEditing !== null){
+    if (isDisplayForm && taskEditing !== null) {
       setisDisplayForm(true);
-      settaskEditing(null)
-    }
-    else
-    {
+      settaskEditing(null);
+    } else {
       setisDisplayForm(!isDisplayForm);
-      settaskEditing(null)
-
+      settaskEditing(null);
     }
-    
   }
 
   function onClose() {
@@ -57,19 +57,16 @@ function App() {
   }
 
   function onSubmit(data) {
-    if(data.id === ''){
+    if (data.id === "") {
       data.id = generateID();
       task.push(data);
-    }
-    else {
+    } else {
       var index = findIndex(data.id);
       task[index] = data;
     }
     setLoad(!onload);
     settaskEditing(null);
-    localStorage.setItem('test', JSON.stringify(task));
-    
-
+    localStorage.setItem("test", JSON.stringify(task));
   }
   function onUpdateStatus(id) {
     var index = findIndex(id);
@@ -77,9 +74,9 @@ function App() {
     if (index !== -1) {
       task[index].status = !task[index].status;
 
-      setTask(task)
+      setTask(task);
     }
-    localStorage.setItem('test', JSON.stringify(task));
+    localStorage.setItem("test", JSON.stringify(task));
     setLoad(!onload);
   }
 
@@ -93,14 +90,16 @@ function App() {
     return result;
   }
 
+  // ON DELETE
+
   function onDelete(id) {
     var index = findIndex(id);
 
     if (index !== -1) {
       task.splice(index, 1);
-      setTask(task)
+      setTask(task);
     }
-    localStorage.setItem('test', JSON.stringify(task));
+    localStorage.setItem("test", JSON.stringify(task));
     setLoad(!onload);
     onClose();
   }
@@ -112,6 +111,51 @@ function App() {
     onShow();
   }
 
+  function onFilter(filterName, filterStatus) {
+    filterStatus = +filterStatus;
+    filterName = filterName.toLowerCase();
+    var taskData = [];
+
+    if (filterStatus === -1) {
+      taskData = task;
+    } else {
+      if (filterStatus === 1) {
+        task.forEach((el) => {
+          if (el.status === true) {
+            return taskData.push(el);
+          }
+        });
+      } else {
+        task.forEach((el) => {
+          if (el.status === false) {
+            return taskData.push(el);
+          }
+        });
+      }
+    }
+
+    if (filterName) {
+      taskData = taskData.filter((el) => {
+        return includes(el.name.toLowerCase(), filterName);
+      });
+      settaskList(taskData);
+    } else {
+      settaskList(taskData);
+    }
+  }
+
+  function onSearch(keyword) {
+    let taskData = task;
+    if (keyword !== "") {
+      taskData = taskData.filter((el) => {
+        return includes(el.name.toLowerCase(), keyword.toLowerCase());
+      });
+      settaskList(taskData);
+    } else {
+      settaskList(taskData);
+    }
+  }
+
   return (
     <div className="container">
       <div className="text-center">
@@ -119,15 +163,34 @@ function App() {
         <hr />
       </div>
       <div className="row">
-        <div className={isDisplayForm ? 'col-xs-4 col-sm-4 col-md-4 col-lg-4' : ''}>
+        <div
+          className={isDisplayForm ? "col-xs-4 col-sm-4 col-md-4 col-lg-4" : ""}
+        >
           {elmTaskForm}
         </div>
-        <div className={isDisplayForm ? 'col-xs-8 col-sm-8 col-md-8 col-lg-8' : 'col-xs-12 col-sm-12 col-md-12 col-lg-12'}>
-          <button type="button" className="btn btn-primary"
+        <div
+          className={
+            isDisplayForm
+              ? "col-xs-8 col-sm-8 col-md-8 col-lg-8"
+              : "col-xs-12 col-sm-12 col-md-12 col-lg-12"
+          }
+        >
+          <button
+            type="button"
+            className="btn btn-primary"
             onClick={onToggleForm}
-          ><i className="fas fa-plus mr-2"></i>Thêm công việc</button>
-          <Control />
-          <TaskList tasks={task} onUpdateStatus={onUpdateStatus} onDelete={onDelete} onUpdate={onUpdate} />
+          >
+            <i className="fas fa-plus mr-2"></i>Thêm công việc
+          </button>
+          <Control onSearch={onSearch} />
+          <TaskList
+            // tasks={task}
+            tasks={tasklist ? tasklist : task}
+            onUpdateStatus={onUpdateStatus}
+            onDelete={onDelete}
+            onUpdate={onUpdate}
+            onFilter={onFilter}
+          />
         </div>
       </div>
     </div>
