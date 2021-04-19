@@ -133,7 +133,7 @@ function App() {
         });
       }
     }
-
+    // console.log("git");
     if (filterName) {
       taskData = taskData.filter((el) => {
         return includes(el.name.toLowerCase(), filterName);
