@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
 import "./App.css";
 import TaskForm from "./components/TaskForm";
-import Control from "./components/Control";
+import TaskControl from "./components/TaskControl";
 import TaskList from "./components/TaskList";
 import { includes } from "lodash";
+import _ from "lodash";
 
 function App() {
   const [task, setTask] = useState([]);
@@ -11,8 +12,8 @@ function App() {
   const [onload, setLoad] = useState();
   const [isDisplayForm, setisDisplayForm] = useState(false);
   const [taskEditing, settaskEditing] = useState(null);
-
-  const [keyword, setkeyword] = useState("");
+  const [sortBy, setSortBy] = useState("name");
+  const [sortValue, setSortValue] = useState(1);
 
   function s4() {
     return Math.floor((1 + Math.random()) * 0x10000)
@@ -69,7 +70,10 @@ function App() {
     localStorage.setItem("test", JSON.stringify(task));
   }
   function onUpdateStatus(id) {
-    var index = findIndex(id);
+    //var index = findIndex(id);
+    var index = _.findIndex(task, (tasks) => {
+      return tasks.id === id;
+    });
 
     if (index !== -1) {
       task[index].status = !task[index].status;
@@ -156,6 +160,25 @@ function App() {
     }
   }
 
+  function onSort(sortBy, sortValue) {
+    setSortBy(sortBy);
+    setSortValue(sortValue);
+  }
+
+  if (sortBy === "name") {
+    task.sort((a, b) => {
+      if (a.name > b.name) return sortValue;
+      else if (a.name < b.name) return -sortValue;
+      else return 0;
+    });
+  } else {
+    task.sort((a, b) => {
+      if (a.status > b.status) return -sortValue;
+      else if (a.status < b.status) return sortValue;
+      else return 0;
+    });
+  }
+
   return (
     <div className="container">
       <div className="text-center">
@@ -182,7 +205,12 @@ function App() {
           >
             <i className="fas fa-plus mr-2"></i>Thêm công việc
           </button>
-          <Control onSearch={onSearch} />
+          <TaskControl
+            onSearch={onSearch}
+            onSort={onSort}
+            sortBy={sortBy}
+            sortValue={sortValue}
+          />
           <TaskList
             // tasks={task}
             tasks={tasklist ? tasklist : task}

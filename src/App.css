@@ -37,22 +37,21 @@
   }
 }
 
-
 .dropdowm-menu .fa::before {
-  padding-right:10px ;
+  padding-right: 10px;
 }
 
-.text-right{
+.text-right {
   float: right;
   cursor: pointer;
 }
 
-.text-right:hover{
-  color:red;
+.text-right:hover {
+  color: red;
 }
 
-.sort_selected::after{
-  content: '\f00c';
+.sort_selected::after {
+  content: "\f00c";
   font-family: FontAweSome;
   font-weight: normal;
   font-style: normal;

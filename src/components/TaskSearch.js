@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-function Control(props) {
+function TaskSearch(props) {
   const [keyword, setkeyword] = useState("");
 
   function onChange(event) {
@@ -36,4 +36,4 @@ function Control(props) {
     </div>
   );
 }
-export default Control;
+export default TaskSearch;
